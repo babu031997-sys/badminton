@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a3a8f">
+  <title>🏸 Player Registration | Smash Cup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --primary: #1a3a8f; --primary-light: #2a5abf; --primary-lighter: #e8f0ff;
+      --accent-yellow: #fdd835; --accent-yellow-dark: #f9a825;
+      --success: #2e7d32; --success-light: #e8f5e9;
+      --warning: #e65100; --danger: #c62828;
+      --text-dark: #0d1b3e; --text-muted: #5a6a8a;
+      --border: #c5d5f0; --white: #ffffff; --bg: #eef3fc;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26,58,143,0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(253,216,53,0.08), transparent),
+        var(--bg);
+      color: var(--text-dark); min-height: 100vh; padding: 1.5rem;
+      line-height: 1.4; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    .container { max-width: 1100px; margin: 0 auto; animation: fadeInUp 0.6s ease both; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .header {
+      background: linear-gradient(135deg, #0d1b3e 0%, #1a3a8f 50%, #2a5abf 100%);
+      border-radius: 20px 20px 0 0; padding: 1.8rem 2rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 8px 30px rgba(13,27,62,0.3);
+    }
+    .header::before {
+      content: ""; position: absolute; top: -50%; right: -10%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(253,216,53,0.25), transparent 70%);
+      border-radius: 50%; pointer-events: none;
+      animation: pulseHeader 5s ease-in-out infinite;
+    }
+    @keyframes pulseHeader { 0%,100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
+    .header::after {
+      content: ""; position: absolute; bottom: -60%; left: -5%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .header-content {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .header-left { display: flex; align-items: center; gap: 1.2rem; }
+    .header-icon {
+      font-size: 3rem; line-height: 1;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+    @keyframes floatIcon { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-8px) rotate(5deg); } }
+    .header-text h1 {
+      font-family: 'Anton', 'Bebas Neue', sans-serif;
+      font-size: 1.9rem; font-weight: 400; color: var(--white);
+      letter-spacing: 1px; line-height: 1.1; text-transform: uppercase;
+    }
+    .header-text h1 span { color: var(--accent-yellow); filter: drop-shadow(0 0 20px rgba(253,216,53,0.5)); }
+    .header-text p {
+      font-size: 0.78rem; color: rgba(255,255,255,0.7);
+      font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px;
+    }
+
+    .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .btn-nav {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.55rem 1rem; border-radius: 10px;
+      font-family: inherit; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+      min-height: 40px;
+      background: rgba(255,255,255,0.12); color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      backdrop-filter: blur(10px);
+    }
+    .btn-nav:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+
+    .sync-status {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.45rem 0.9rem; border-radius: 50px;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff; position: relative; z-index: 2;
+    }
+    .sync-status .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #fdd835; box-shadow: 0 0 10px #fdd835;
+      animation: blink 1.6s ease-in-out infinite;
+    }
+    .sync-status.online .dot { background: #00ffb3; box-shadow: 0 0 10px #00ffb3; }
+    .sync-status.offline .dot { background: #e53935; box-shadow: 0 0 10px #e53935; animation: none; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .main-card {
+      background: var(--white);
+      border-radius: 0 0 20px 20px;
+      padding: 2rem;
+      box-shadow: 0 8px 30px rgba(13,27,62,0.1);
+      border: 1.5px solid var(--primary-lighter);
+      border-top: none;
+    }
+
+    .info-banner {
+      background: linear-gradient(135deg, #fff8e1, #fffde7);
+      border: 1.5px solid #ffe082;
+      border-radius: 14px;
+      padding: 1rem 1.2rem; margin-bottom: 1.8rem;
+      display: flex; align-items: center; gap: 0.9rem;
+      position: relative; overflow: hidden;
+    }
+    .info-banner::before {
+      content: ""; position: absolute; top: -50%; right: -10%;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(253,216,53,0.2), transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .info-banner .info-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; position: relative; z-index: 1; }
+    .info-banner .info-text {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text-dark); line-height: 1.45;
+      position: relative; z-index: 1;
+    }
+    .info-banner .info-text strong { color: var(--primary); font-weight: 800; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 1.2rem; padding-bottom: 0.7rem;
+      border-bottom: 2px solid var(--primary-lighter);
+    }
+    .section-header .icon {
+      font-size: 1.4rem; background: var(--primary); color: var(--white);
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(26,58,143,0.25); flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--primary); letter-spacing: 1px; text-transform: uppercase;
+    }
+    .section-header .count-badge {
+      margin-left: auto; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      padding: 4px 12px; border-radius: 50px;
+      box-shadow: 0 3px 10px rgba(26,58,143,0.25);
+    }
+
+    /* ═══ TEAMS GRID ═══ */
+    .teams-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+    .team-card {
+      border-radius: 16px; padding: 1.3rem 1.2rem;
+      border: 2px solid;
+      position: relative; overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .team-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0;
+      height: 5px; background: currentColor; opacity: 0.7;
+    }
+    .team-card::after {
+      content: ""; position: absolute; top: -40px; right: -40px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, currentColor, transparent 70%);
+      opacity: 0.07; border-radius: 50%; pointer-events: none;
+    }
+    .team-card[data-team="A"] { background: #e3f2fd; border-color: #1e88e5; color: #0d47a1; }
+    .team-card[data-team="B"] { background: #e8f5e9; border-color: #43a047; color: #1b5e20; }
+    .team-card[data-team="C"] { background: #fff3e0; border-color: #fb8c00; color: #e65100; }
+    .team-card[data-team="D"] { background: #f3e5f5; border-color: #8e24aa; color: #4a148c; }
+    .team-card[data-team="E"] { background: #fce4ec; border-color: #e91e63; color: #880e4f; }
+    .team-card[data-team="F"] { background: #e0f7fa; border-color: #00838f; color: #004d56; }
+
+    .team-card.complete { box-shadow: 0 10px 30px rgba(46,125,50,0.18); }
+
+    .team-form-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin-bottom: 1rem; position: relative; z-index: 1;
+    }
+    .team-form-badge {
+      width: 46px; height: 46px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif; font-size: 1.4rem;
+      color: var(--white); flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .team-card[data-team="A"] .team-form-badge { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+    .team-card[data-team="B"] .team-form-badge { background: linear-gradient(135deg, #43a047, #2e7d32); }
+    .team-card[data-team="C"] .team-form-badge { background: linear-gradient(135deg, #fb8c00, #e65100); }
+    .team-card[data-team="D"] .team-form-badge { background: linear-gradient(135deg, #8e24aa, #6a1b9a); }
+    .team-card[data-team="E"] .team-form-badge { background: linear-gradient(135deg, #e91e63, #ad1457); }
+    .team-card[data-team="F"] .team-form-badge { background: linear-gradient(135deg, #00838f, #006064); }
+
+    .team-form-title { flex: 1; min-width: 0; }
+    .team-form-label {
+      font-size: 0.6rem; font-weight: 800;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      opacity: 0.7; margin-bottom: 2px;
+    }
+    .team-form-name-display {
+      font-size: 1rem; font-weight: 800; color: inherit;
+      padding: 2px 0; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ═══ PER-PLAYER ROWS ═══ */
+    .players-list {
+      display: flex; flex-direction: column; gap: 0.7rem;
+      position: relative; z-index: 1;
+    }
+
+    .player-row {
+      background: rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+      border: 1.5px solid rgba(0,0,0,0.06);
+      transition: all 0.25s;
+    }
+    .player-row:focus-within {
+      background: rgba(255,255,255,0.98);
+      border-color: currentColor;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+    }
+    .player-row.saved {
+      background: rgba(232,245,233,0.75);
+      border-color: rgba(46,125,50,0.35);
+    }
+
+    .player-row-top {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .player-row-left {
+      display: flex; align-items: center; gap: 0.5rem;
+      min-width: 0;
+    }
+    .player-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800;
+      background: rgba(255,255,255,0.9);
+      color: currentColor; flex-shrink: 0;
+      border: 1.5px solid currentColor;
+    }
+    .player-role {
+      font-size: 0.6rem; font-weight: 800;
+      letter-spacing: 1.8px; text-transform: uppercase;
+      opacity: 0.75;
+    }
+    .player-status {
+      font-size: 0.58rem; font-weight: 800;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 4px;
+      flex-shrink: 0;
+    }
+    .player-status.saved { color: var(--success); }
+    .player-status.not-saved { color: var(--warning); }
+    .player-status .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 6px currentColor;
+    }
+
+    .player-row-input {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .player-input {
+      flex: 1; font-size: 0.9rem; font-weight: 600;
+      color: inherit; background: transparent; border: none;
+      padding: 5px 2px; font-family: inherit; outline: none;
+      min-height: 34px; min-width: 0;
+      border-bottom: 1.5px dashed currentColor;
+      transition: border-color 0.2s;
+    }
+    .player-input:focus { border-bottom-style: solid; border-bottom-width: 2px; }
+    .player-input::placeholder { color: currentColor; opacity: 0.4; font-weight: 500; }
+    .player-input:disabled { opacity: 0.95; border-bottom-color: transparent; }
+
+    .player-save-btn {
+      padding: 0.5rem 0.85rem;
+      border-radius: 9px; border: none;
+      font-family: inherit; font-size: 0.62rem; font-weight: 800;
+      letter-spacing: 0.8px; text-transform: uppercase;
+      cursor: pointer; transition: all 0.25s;
+      display: inline-flex; align-items: center; gap: 5px;
+      min-height: 34px; flex-shrink: 0;
+    }
+    .player-save-btn.save {
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      color: var(--white);
+      box-shadow: 0 3px 10px rgba(46,125,50,0.35);
+    }
+    .player-save-btn.save:hover:not(:disabled) {
+      box-shadow: 0 6px 18px rgba(46,125,50,0.5);
+      transform: translateY(-2px);
+    }
+    .player-save-btn.save:disabled {
+      opacity: 0.45; cursor: not-allowed; transform: none;
+    }
+    .player-save-btn.locked {
+      background: rgba(46,125,50,0.15);
+      color: var(--success);
+      border: 1.5px solid rgba(46,125,50,0.35);
+      cursor: default;
+    }
+
+    .team-complete-badge {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 0.55rem;
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      color: #fff;
+      border-radius: 10px;
+      font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      margin-top: 0.7rem;
+      position: relative; z-index: 1;
+      box-shadow: 0 4px 12px rgba(46,125,50,0.35);
+    }
+
+    .char-counter {
+      font-size: 0.58rem; font-weight: 700;
+      color: currentColor; opacity: 0.5;
+      flex-shrink: 0; letter-spacing: 0.4px;
+      min-width: 32px; text-align: right;
+      position: absolute; right: 0.8rem; top: 0.55rem;
+    }
+
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: var(--text-dark); color: var(--white);
+      padding: 0.8rem 1.6rem; border-radius: 12px;
+      font-size: 0.85rem; font-weight: 700;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 9999; display: flex; align-items: center; gap: 8px;
+      pointer-events: none; max-width: 90vw;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: linear-gradient(135deg, #2e7d32, #43a047); }
+    .toast.danger { background: linear-gradient(135deg, #c62828, #e53935); }
+    .toast.info { background: linear-gradient(135deg, #1a3a8f, #2a5abf); }
+
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(13,27,62,0.6);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 10000; opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease; padding: 1rem;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: var(--white); border-radius: 20px;
+      padding: 2rem; max-width: 440px; width: 100%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      text-align: center;
+    }
+    .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+    .modal-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+    .modal h3 {
+      font-size: 1.3rem; font-weight: 800;
+      color: var(--text-dark); margin-bottom: 0.5rem;
+    }
+    .modal p {
+      font-size: 0.88rem; color: var(--text-muted);
+      margin-bottom: 1.5rem; line-height: 1.5;
+    }
+    .modal p strong { color: var(--text-dark); }
+    .modal-actions { display: flex; gap: 0.8rem; justify-content: center; }
+    .modal-actions .btn {
+      flex: 1; justify-content: center;
+      padding: 0.8rem 1.5rem; font-size: 0.85rem;
+      min-height: 48px; border-radius: 10px; border: none;
+      font-family: inherit; font-weight: 800;
+      cursor: pointer; letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-danger { background: var(--danger); color: var(--white); }
+    .btn-danger:hover { background: #b71c1c; }
+    .btn-save {
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      color: var(--white);
+    }
+    .btn-save:hover { background: linear-gradient(135deg, #1b5e20, #2e7d32); }
+    .btn-cancel {
+      background: #e8f0ff; color: var(--primary);
+      border: 1.5px solid var(--border) !important;
+    }
+    .btn-cancel:hover { background: var(--primary-lighter); }
+
+    @media (max-width: 900px) {
+      .teams-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      body { padding: 0.6rem; }
+      .header { padding: 1.2rem 1rem; border-radius: 16px 16px 0 0; }
+      .header-content { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+      .header-left { gap: 0.8rem; }
+      .header-icon { font-size: 2.3rem; }
+      .header-text h1 { font-size: 1.35rem; letter-spacing: 0.5px; }
+      .header-text p { font-size: 0.6rem; letter-spacing: 2px; }
+      .header-actions { width: 100%; gap: 0.4rem; }
+      .header-actions .btn-nav { flex: 1; font-size: 0.62rem; padding: 0.5rem 0.6rem; justify-content: center; }
+      .sync-status { align-self: flex-start; }
+      .main-card { padding: 1.2rem 1rem; border-radius: 0 0 16px 16px; }
+      .info-banner { padding: 0.85rem 1rem; gap: 0.7rem; }
+      .info-banner .info-icon { font-size: 1.3rem; }
+      .info-banner .info-text { font-size: 0.74rem; }
+      .section-header .icon { width: 34px; height: 34px; font-size: 1.15rem; border-radius: 8px; }
+      .section-header h2 { font-size: 0.9rem; letter-spacing: 0.5px; }
+      .section-header .count-badge { font-size: 0.6rem; padding: 3px 9px; }
+      .teams-grid { gap: 0.9rem; }
+      .team-card { padding: 1.05rem 1rem; border-radius: 14px; }
+      .team-form-badge { width: 40px; height: 40px; font-size: 1.2rem; }
+      .team-form-label { font-size: 0.55rem; letter-spacing: 2px; }
+      .team-form-name-display { font-size: 0.9rem; }
+      .player-row { padding: 0.6rem 0.7rem; }
+      .player-num { width: 22px; height: 22px; font-size: 0.62rem; }
+      .player-role { font-size: 0.56rem; letter-spacing: 1.5px; }
+      .player-input { font-size: 0.85rem; min-height: 32px; }
+      .player-save-btn { font-size: 0.58rem; padding: 0.45rem 0.7rem; min-height: 32px; }
+      .char-counter { font-size: 0.55rem; }
+      .modal { padding: 1.5rem 1.2rem; }
+      .modal h3 { font-size: 1.1rem; }
+      .modal p { font-size: 0.82rem; margin-bottom: 1.2rem; }
+      .modal-actions { gap: 0.5rem; }
+      .toast { font-size: 0.78rem; padding: 0.7rem 1.2rem; bottom: 1.2rem; }
+    }
+    @media (max-width: 480px) {
+      body { padding: 0.4rem; }
+      .header { padding: 1rem 0.8rem; }
+      .header-icon { font-size: 1.9rem; }
+      .header-text h1 { font-size: 1.1rem; }
+      .header-text p { font-size: 0.55rem; letter-spacing: 1.5px; }
+      .main-card { padding: 1rem 0.75rem; }
+      .team-card { padding: 0.95rem 0.85rem; }
+      .team-form-badge { width: 36px; height: 36px; font-size: 1.05rem; }
+      .player-input { font-size: 0.8rem; }
+      .player-save-btn { font-size: 0.55rem; padding: 0.4rem 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="header-icon">🏸</div>
+        <div class="header-text">
+          <h1>Player <span>Registration</span></h1>
+          <p>Smash Cup • Doubles Tournament</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="sync-status" id="syncStatus">
+          <span class="dot"></span>
+          <span id="syncText">Connecting...</span>
+        </div>
+        <a href="tournament.html" class="btn-nav">🏆 Tournament</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-card">
+    <div class="info-banner">
+      <span class="info-icon">💡</span>
+      <div class="info-text">
+        Each player enters their own name and clicks <strong>Save</strong>.
+        Once saved, that name is <strong>locked</strong> — contact admin for changes.
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="icon">👥</span>
+      <h2>Teams &amp; Players</h2>
+      <span class="count-badge" id="countBadge">0 / 0 saved</span>
+    </div>
+
+    <div class="teams-grid" id="teamsGrid"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg">Saved!</span>
+</div>
+
+<div class="modal-overlay" id="saveModal">
+  <div class="modal">
+    <div class="modal-icon">🔒</div>
+    <h3>Save &amp; Lock This Name?</h3>
+    <p id="saveModalBody">
+      Once saved, this name is locked and cannot be edited from the players page.
+      Only the admin can make changes afterward. Continue?
+    </p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeSaveModal()">Cancel</button>
+      <button class="btn btn-save" onclick="confirmSave()">🔒 Save &amp; Lock</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  doc,
+  onSnapshot,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB67bgSrWf-kAih-Rd3LhqL6TuMgCig3B4",
+  authDomain: "badminton-tenement.firebaseapp.com",
+  projectId: "badminton-tenement",
+  storageBucket: "badminton-tenement.firebasestorage.app",
+  messagingSenderId: "729611648475",
+  appId: "1:729611648475:web:3e7603d471778e0f41bbfe",
+  measurementId: "G-X4C8G5RQP9"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+});
+const auth = getAuth(app);
+const DOC_REF = doc(db, 'tournaments', 'current');
+
+const MAX_NAME_LENGTH = 20;
+const TEAM_KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+const DEFAULT_STATE = {
+  teamCount: 4,
+  teams: {
+    A: { name: 'Team A', player1: '', player2: '', player1Locked: false, player2Locked: false },
+    B: { name: 'Team B', player1: '', player2: '', player1Locked: false, player2Locked: false },
+    C: { name: 'Team C', player1: '', player2: '', player1Locked: false, player2Locked: false },
+    D: { name: 'Team D', player1: '', player2: '', player1Locked: false, player2Locked: false },
+    E: { name: 'Team E', player1: '', player2: '', player1Locked: false, player2Locked: false },
+    F: { name: 'Team F', player1: '', player2: '', player1Locked: false, player2Locked: false }
+  },
+  matches: [],
+  playoffs: { semis: [], final: { team1: '', team2: '', score1: '', score2: '', winner: '' } }
+};
+
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let isRemoteUpdate = false;
+let pendingSaveTeam = null;
+let pendingSaveField = null;
+
+// ═══ TOAST ═══
+let toastTimeout;
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toastIcon');
+  const msgEl = document.getElementById('toastMsg');
+  icon.textContent = type === 'success' ? '✅' : type === 'danger' ? '⚠️' : 'ℹ️';
+  msgEl.textContent = msg;
+  toast.className = 'toast show ' + type;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2200);
+}
+
+function setSyncStatus(status, text) {
+  const el = document.getElementById('syncStatus');
+  const txt = document.getElementById('syncText');
+  if (!el || !txt) return;
+  el.className = 'sync-status ' + status;
+  txt.textContent = text;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function saveState() {
+  if (isRemoteUpdate) return;
+  try {
+    await setDoc(DOC_REF, state);
+    setSyncStatus('online', 'Synced');
+  } catch (e) {
+    console.error('Save failed:', e);
+    setSyncStatus('offline', 'Offline');
+    showToast('Save failed', 'danger');
+  }
+}
+
+// ═══ AUTH + LISTENER ═══
+signInAnonymously(auth).catch(err => console.error('Auth failed:', err));
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) return;
+  onSnapshot(DOC_REF, (snapshot) => {
+    setSyncStatus('online', 'Connected');
+    if (snapshot.exists()) {
+      const remote = snapshot.data();
+      if (!remote.teams) remote.teams = {};
+      TEAM_KEYS.forEach(k => {
+        if (!remote.teams[k]) remote.teams[k] = {};
+        const t = remote.teams[k];
+        if (!t.name) t.name = `Team ${k}`;
+        if (typeof t.player1 !== 'string') t.player1 = '';
+        if (typeof t.player2 !== 'string') t.player2 = '';
+        if (typeof t.player1Locked !== 'boolean') t.player1Locked = false;
+        if (typeof t.player2Locked !== 'boolean') t.player2Locked = false;
+        if (t.locked === true && !t.player1Locked && !t.player2Locked) {
+          t.player1Locked = true;
+          t.player2Locked = true;
+          delete t.locked;
+        }
+      });
+      if (!remote.teamCount) remote.teamCount = 4;
+
+      if (JSON.stringify(remote) !== JSON.stringify(state)) {
+        state = remote;
+        isRemoteUpdate = true;
+        renderAll();
+        isRemoteUpdate = false;
+      }
+    } else {
+      setDoc(DOC_REF, DEFAULT_STATE).catch(e => console.error(e));
+    }
+  }, (error) => {
+    console.error('Firebase error:', error);
+    setSyncStatus('offline', 'Offline');
+  });
+});
+
+// ═══ ONLINE / OFFLINE ═══
+window.addEventListener('online', () => {
+  setSyncStatus('online', 'Connected');
+  showToast('🌐 Back online', 'success');
+});
+window.addEventListener('offline', () => {
+  setSyncStatus('offline', 'Offline — will sync later');
+  showToast('📴 Offline mode', 'info');
+});
+if (!navigator.onLine) {
+  setTimeout(() => setSyncStatus('offline', 'Offline — will sync later'), 100);
+}
+
+// ═══ RENDER ═══
+function renderAll() {
+  renderTeams();
+  updateCountBadge();
+}
+
+function renderTeams() {
+  const grid = document.getElementById('teamsGrid');
+  const activeKeys = TEAM_KEYS.slice(0, state.teamCount);
+
+  grid.innerHTML = activeKeys.map(key => {
+    const t = state.teams[key];
+    const p1Locked = t.player1Locked === true;
+    const p2Locked = t.player2Locked === true;
+    const isComplete = p1Locked && p2Locked;
+
+    return `
+      <div class="team-card ${isComplete ? 'complete' : ''}" data-team="${key}">
+        <div class="team-form-header">
+          <div class="team-form-badge">${key}</div>
+          <div class="team-form-title">
+            <div class="team-form-label">Team ${key}</div>
+            <div class="team-form-name-display">${escapeHtml(t.name)}</div>
+          </div>
+        </div>
+
+        <div class="players-list">
+          ${renderPlayerRow(key, 1, t.player1, p1Locked)}
+          ${renderPlayerRow(key, 2, t.player2, p2Locked)}
+        </div>
+
+        ${isComplete ? `
+          <div class="team-complete-badge">
+            🔒 Team Complete — Both Players Saved
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPlayerRow(teamKey, playerNum, playerValue, isLocked) {
+  const field = playerNum === 1 ? 'player1' : 'player2';
+  const statusClass = isLocked ? 'saved' : 'not-saved';
+  const statusText = isLocked ? 'Saved' : 'Not Saved';
+  const counterId = `counter-${teamKey}-${playerNum}`;
+
+  return `
+    <div class="player-row ${isLocked ? 'saved' : ''}" data-player="${playerNum}">
+      <div class="player-row-top">
+        <div class="player-row-left">
+          <div class="player-num">${playerNum}</div>
+          <div class="player-role">Player ${playerNum}</div>
+        </div>
+        <div class="player-status ${statusClass}">
+          <span class="dot"></span>
+          ${statusText}
+        </div>
+      </div>
+      <div class="player-row-input">
+        <input type="text" class="player-input"
+          value="${escapeHtml(playerValue)}"
+          placeholder="Enter full name"
+          maxlength="${MAX_NAME_LENGTH}"
+          data-team="${teamKey}"
+          data-field="${field}"
+          oninput="handleInput(this, ${playerNum})"
+          ${isLocked ? 'disabled' : ''} />
+        <span class="char-counter" id="${counterId}">${(playerValue || '').length}/${MAX_NAME_LENGTH}</span>
+        ${isLocked
+          ? `<button class="player-save-btn locked" disabled>🔒 Locked</button>`
+          : `<button class="player-save-btn save" onclick="openSaveModal('${teamKey}', ${playerNum})">💾 Save</button>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+window.handleInput = function(el, playerNum) {
+  const team = el.dataset.team;
+  const field = el.dataset.field;
+
+  if (state.teams[team][field + 'Locked']) {
+    el.value = state.teams[team][field] || '';
+    return;
+  }
+
+  const val = el.value.substring(0, MAX_NAME_LENGTH);
+  if (el.value !== val) el.value = val;
+  state.teams[team][field] = val;
+
+  const counter = document.getElementById(`counter-${team}-${playerNum}`);
+  if (counter) counter.textContent = `${val.length}/${MAX_NAME_LENGTH}`;
+
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(() => saveState(), 300);
+};
+
+let saveDebounce;
+
+function updateCountBadge() {
+  const badge = document.getElementById('countBadge');
+  const activeKeys = TEAM_KEYS.slice(0, state.teamCount);
+  const totalPlayers = activeKeys.length * 2;
+  let saved = 0;
+  activeKeys.forEach(k => {
+    if (state.teams[k].player1Locked) saved++;
+    if (state.teams[k].player2Locked) saved++;
+  });
+  badge.textContent = `${saved} / ${totalPlayers} saved`;
+
+  if (saved === totalPlayers) {
+    badge.style.background = 'linear-gradient(135deg, #2e7d32, #43a047)';
+    badge.style.color = '#ffffff';
+  } else if (saved >= totalPlayers / 2) {
+    badge.style.background = 'linear-gradient(135deg, #f9a825, #fdd835)';
+    badge.style.color = '#0d1b3e';
+  } else {
+    badge.style.background = 'linear-gradient(135deg, #1a3a8f, #2a5abf)';
+    badge.style.color = '#ffffff';
+  }
+}
+
+// ═══ SAVE FLOW ═══
+window.openSaveModal = function(teamKey, playerNum) {
+  const field = playerNum === 1 ? 'player1' : 'player2';
+  const name = state.teams[teamKey][field];
+  const teamName = state.teams[teamKey].name;
+
+  if (!name || !name.trim()) {
+    showToast('Please enter a name before saving', 'danger');
+    return;
+  }
+
+  pendingSaveTeam = teamKey;
+  pendingSaveField = field;
+
+  const body = document.getElementById('saveModalBody');
+  body.innerHTML = `
+    You're about to save and lock <strong>${escapeHtml(name)}</strong>
+    as <strong>Player ${playerNum}</strong> for <strong>${escapeHtml(teamName)}</strong>.
+    <br><br>
+    After saving, this name <strong>cannot be edited</strong> from the players page.
+    Contact the admin to make changes.
+  `;
+  document.getElementById('saveModal').classList.add('show');
+};
+
+window.closeSaveModal = function() {
+  document.getElementById('saveModal').classList.remove('show');
+  pendingSaveTeam = null;
+  pendingSaveField = null;
+};
+
+window.confirmSave = async function() {
+  if (!pendingSaveTeam || !pendingSaveField) return;
+  const team = pendingSaveTeam;
+  const field = pendingSaveField;
+
+  state.teams[team][field + 'Locked'] = true;
+  state.teams[team][field + 'LockedAt'] = Date.now();
+
+  await saveState();
+
+  closeSaveModal();
+  renderAll();
+
+  const playerNum = field === 'player1' ? 1 : 2;
+  showToast(`✅ Player ${playerNum} name saved & locked!`, 'success');
+};
+
+document.getElementById('saveModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSaveModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSaveModal();
+});
+
+// ═══ INIT ═══
+renderAll();
+setSyncStatus('', 'Connecting...');
+</script>
+
+</body>
+</html>
